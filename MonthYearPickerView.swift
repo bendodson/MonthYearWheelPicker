@@ -52,7 +52,7 @@ class MonthYearPickerView: UIPickerView, UIPickerViewDelegate, UIPickerViewDataS
         var months: [String] = []
         var month = 0
         for _ in 1...12 {
-            months.append(NSDateFormatter().monthSymbols[month].capitalizedString)
+            months.append(DateFormatter().monthSymbols[month].capitalized)
             month += 1
         }
         self.months = months
