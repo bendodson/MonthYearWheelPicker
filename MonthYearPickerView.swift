@@ -9,9 +9,8 @@ import UIKit
 
 class MonthYearPickerView: UIPickerView, UIPickerViewDelegate, UIPickerViewDataSource {
     
-    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    var months: [String]!
     var years: [Int]!
-    
     
     var month: Int = 0 {
         didSet {
@@ -38,6 +37,7 @@ class MonthYearPickerView: UIPickerView, UIPickerViewDelegate, UIPickerViewDataS
     }
     
     func commonSetup() {
+        // population years
         var years: [Int] = []
         if years.count == 0 {
             var year = NSCalendar(identifier: NSCalendar.Identifier.gregorian)!.component(.year, from: NSDate() as Date)
@@ -48,11 +48,20 @@ class MonthYearPickerView: UIPickerView, UIPickerViewDelegate, UIPickerViewDataS
         }
         self.years = years
         
+        // population months with localized names
+        var months: [String] = []
+        var month = 0
+        for _ in 1...12 {
+            months.append(NSDateFormatter().monthSymbols[month].capitalizedString)
+            month += 1
+        }
+        self.months = months
+        
         self.delegate = self
         self.dataSource = self
         
-        let month = NSCalendar(identifier: NSCalendar.Identifier.gregorian)!.component(.month, from: NSDate() as Date)
-        self.selectRow(month-1, inComponent: 0, animated: false)
+        let currentMonth = NSCalendar(identifier: NSCalendar.Identifier.gregorian)!.component(.month, from: NSDate() as Date)
+        self.selectRow(currentMonth - 1, inComponent: 0, animated: false)
     }
     
     // Mark: UIPicker Delegate / Data Source
