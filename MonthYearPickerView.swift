@@ -3,6 +3,7 @@
 //
 //  Created by Ben Dodson on 15/04/2015.
 //  Modified by Jiayang Miao on 24/10/2016 to support Swift 3
+//  Modified by David Luque on 24/01/2018 to get default date
 //
 
 import UIKit
@@ -12,13 +13,13 @@ class MonthYearPickerView: UIPickerView, UIPickerViewDelegate, UIPickerViewDataS
     var months: [String]!
     var years: [Int]!
     
-    var month: Int = 0 {
+    var month = Calendar.current.component(.month, from: Date()) {
         didSet {
             selectRow(month-1, inComponent: 0, animated: false)
         }
     }
     
-    var year: Int = 0 {
+    var year = Calendar.current.component(.year, from: Date()) {
         didSet {
             selectRow(years.index(of: year)!, inComponent: 1, animated: true)
         }
