@@ -8,11 +8,21 @@
 //
 import UIKit
 
+/// A control for the inputting of month and year values in a view that uses a spinning-wheel or slot-machine metaphor.
 open class MonthYearWheelPicker: UIPickerView {
     
     private var calendar = Calendar(identifier: .gregorian)
-    
     private var _maximumDate: Date?
+    private var _minimumDate: Date?
+    private var _date: Date?
+    private var months = [String]()
+    private var years = [Int]()
+    private var target: AnyObject?
+    private var action: Selector?
+    
+    /// The maximum date that a picker can show.
+    ///
+    /// Use this property to configure the maximum date that is selected in the picker interface. The default is the current month and year.
     open var maximumDate: Date {
         set {
             _maximumDate = formattedDate(from: newValue)
@@ -23,7 +33,9 @@ open class MonthYearWheelPicker: UIPickerView {
         }
     }
     
-    private var _minimumDate: Date?
+    /// The minimum date that a picker can show.
+    ///
+    /// Use this property to configure the minimum date that is selected in the picker interface. The default is the current month and 100 years in the past.
     open var minimumDate: Date {
         set {
             _minimumDate = formattedDate(from: newValue)
@@ -34,22 +46,32 @@ open class MonthYearWheelPicker: UIPickerView {
         }
     }
     
-    private var _date: Date?
+    /// The date displayed by the picker.
+    ///
+    /// Use this property to get and set the currently selected date. The default value of this property is the date when the UIDatePicker object is created. Setting this property animates the date picker by spinning the wheels to the new date and time; if you don't want any animation to occur when you set the date, use the ``setDate(_:animated:)`` method, passing `false` for the animated parameter.
+    ///
+    /// - Note: If you attempt to set the date beyond the ``maximumDate``or below the ``minimumDate`` then the date will be corrected to the closest date within those bounds (i.e. if your maximum date is set to 1st June 2022 and you try to set the date as 1st January 2023, the date that will actually be set will be 1st June 2022).
     open var date: Date {
         set {
-            setDate(newValue, animated: false)
+            setDate(newValue, animated: true)
         }
         get {
             return _date ?? formattedDate(from: Date())
         }
     }
     
+    /// The month displayed by the picker.
+    ///
+    /// Use this property to get the current month in the Gregorian calendar starting from `1` for _January_ through to `12` for _December_.
     open var month = Calendar(identifier: .gregorian).component(.month, from: Date()) {
         didSet {
             selectRow(month - 1, inComponent: 0, animated: false)
         }
     }
     
+    /// The year displayed by the picker.
+    ///
+    /// Use this property to get the current year in the Gregorian calendar.
     open var year = Calendar(identifier: .gregorian).component(.year, from: Date()) {
         didSet {
             if let firstYearIndex = years.firstIndex(of: year) {
@@ -58,12 +80,8 @@ open class MonthYearWheelPicker: UIPickerView {
         }
     }
     
+    /// A completion handler to receive the month and year when the picker value is changed.
     open var onDateSelected: ((_ month: Int, _ year: Int) -> Void)?
-    
-    private var months = [String]()
-    private var years = [Int]()
-    private var target: AnyObject?
-    private var action: Selector?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -73,6 +91,88 @@ open class MonthYearWheelPicker: UIPickerView {
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         commonSetup()
+    }
+    
+    /// Associates a target object and action method with the control.
+    ///
+    /// - parameter target: The target object—that is, the object whose action method is called. If you specify nil, UIKit searches the responder chain for an object that responds to the specified action message and delivers the message to that object.
+    /// - parameter action: A selector identifying the action method to be called. This parameter must not be nil.
+    /// - parameter controlEvents: A bitmask specifying the control-specific events for which the action method is called. This control only supports `.valueChanged`.
+    /// - Note: `MonthYearWheelPicker` does not inherit from `UIControl` so this method is provided only as a way for it be a drop-in replacement for `UIDatePicker` in most scenarios. You can only use the `.valueChanged` control event and you may only set one active target; multiple calls to this method will mean the last call is used as the target / action.
+    public func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControl.Event) {
+        removeTarget()
+        guard controlEvents == .valueChanged else {
+            return
+        }
+        self.target = target as? AnyObject
+        self.action = action
+    }
+    
+    /// Stops the delivery of events to the previously set target object.
+    public func removeTarget() {
+        self.target = nil
+        self.action = nil
+    }
+    
+    /// Stops the delivery of events to the previously set target object.
+    ///
+    /// - Note: `MonthYearWheelPicker` does not inherit from `UIControl` so this method is provided only as a way for it be a drop-in replacement for `UIDatePicker` in most scenarios. The parameters used here are meaningless as any call to this method will result in the previously set target / action being removed.
+    public func removeTarget(_ target: Any?, action: Selector?, for controlEvents: UIControl.Event) {
+        removeTarget()
+    }
+    
+    /// Sets the date to display in the date picker, with an option to animate the setting.
+    ///
+    /// - parameter date: An `NSDate` object representing the new date to display in the date picker.
+    /// - parameter animated: `true` to animate the setting of the new date, otherwise `false`. The animation rotates the wheels until the new month and year is shown under the highlight rectangle.
+    /// - Note: If you attempt to set the date beyond the ``maximumDate``or below the ``minimumDate`` then the date will be corrected to the closest date within those bounds (i.e. if your maximum date is set to 1st June 2022 and you try to set the date as 1st January 2023, the date that will actually be set will be 1st June 2022).
+    public func setDate(_ date: Date, animated: Bool) {
+        let date = formattedDate(from: date)
+        _date = date
+        if date > maximumDate {
+            setDate(maximumDate, animated: true)
+            return
+        }
+        if date < minimumDate {
+            setDate(minimumDate, animated: true)
+            return
+        }
+        updatePickers(animated: animated)
+    }
+    
+    
+    // MARK: Private methods
+    
+    private func updatePickers(animated: Bool) {
+        let month = calendar.component(.month, from: date)
+        let year = calendar.component(.year, from: date)
+        
+        DispatchQueue.main.async {
+            self.selectRow(month - 1, inComponent: 0, animated: animated)
+            if let firstYearIndex = self.years.firstIndex(of: year) {
+                self.selectRow(firstYearIndex, inComponent: 1, animated: animated)
+            }
+        }
+    }
+    
+    private func pickerViewDidSelectRow() {
+        let month = selectedRow(inComponent: 0) + 1
+        let year = years[selectedRow(inComponent: 1)]
+        
+        self.month = month
+        self.year = year
+        guard let date = DateComponents(calendar: calendar, year: year, month: month, day: 1, hour: 0, minute: 0, second: 0).date else {
+            fatalError("Could not generate date from components")
+        }
+        self.date = date
+        
+        if let block = onDateSelected {
+            block(month, year)
+        }
+        
+        if let target = target, let action = action {
+            _ = target.perform(action, with: self)
+        }
     }
     
     private func formattedDate(from date: Date) -> Date {
@@ -106,70 +206,6 @@ open class MonthYearWheelPicker: UIPickerView {
         self.months = months
         
         updateAvailableYears(animated: false)
-    }
-    
-    public func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControl.Event) {
-        removeTarget()
-        guard controlEvents == .valueChanged else {
-            return
-        }
-        self.target = target as? AnyObject
-        self.action = action
-    }
-    
-    public func removeTarget() {
-        self.target = nil
-        self.action = nil
-    }
-    
-    public func removeTarget(_ target: Any?, action: Selector?, for controlEvents: UIControl.Event) {
-        removeTarget()
-    }
-    
-    public func setDate(_ date: Date, animated: Bool) {
-        let date = formattedDate(from: date)
-        _date = date
-        if date > maximumDate {
-            setDate(maximumDate, animated: true)
-            return
-        }
-        if date < minimumDate {
-            setDate(minimumDate, animated: true)
-            return
-        }
-        updatePickers(animated: animated)
-    }
-    
-    private func updatePickers(animated: Bool) {
-        let month = calendar.component(.month, from: date)
-        let year = calendar.component(.year, from: date)
-        
-        DispatchQueue.main.async {
-            self.selectRow(month - 1, inComponent: 0, animated: animated)
-            if let firstYearIndex = self.years.firstIndex(of: year) {
-                self.selectRow(firstYearIndex, inComponent: 1, animated: animated)
-            }
-        }
-    }
-    
-    private func pickerViewDidSelectRow() {
-        let month = selectedRow(inComponent: 0) + 1
-        let year = years[selectedRow(inComponent: 1)]
-        
-        self.month = month
-        self.year = year
-        guard let date = DateComponents(calendar: calendar, year: year, month: month, day: 1, hour: 0, minute: 0, second: 0).date else {
-            fatalError("Could not generate date from components")
-        }
-        self.date = date
-        
-        if let block = onDateSelected {
-            block(month, year)
-        }
-        
-        if let target = target, let action = action {
-            _ = target.perform(action, with: self)
-        }
     }
 }
 
