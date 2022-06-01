@@ -63,21 +63,15 @@ open class MonthYearWheelPicker: UIPickerView {
     /// The month displayed by the picker.
     ///
     /// Use this property to get the current month in the Gregorian calendar starting from `1` for _January_ through to `12` for _December_.
-    open var month = Calendar(identifier: .gregorian).component(.month, from: Date()) {
-        didSet {
-            selectRow(month - 1, inComponent: 0, animated: false)
-        }
+    open var month: Int {
+        return calendar.component(.month, from: date)
     }
     
     /// The year displayed by the picker.
     ///
     /// Use this property to get the current year in the Gregorian calendar.
-    open var year = Calendar(identifier: .gregorian).component(.year, from: Date()) {
-        didSet {
-            if let firstYearIndex = years.firstIndex(of: year) {
-                selectRow(firstYearIndex, inComponent: 1, animated: true)
-            }
-        }
+    open var year: Int {
+        return calendar.component(.year, from: date)
     }
     
     /// A completion handler to receive the month and year when the picker value is changed.
@@ -158,9 +152,6 @@ open class MonthYearWheelPicker: UIPickerView {
     private func pickerViewDidSelectRow() {
         let month = selectedRow(inComponent: 0) + 1
         let year = years[selectedRow(inComponent: 1)]
-        
-        self.month = month
-        self.year = year
         guard let date = DateComponents(calendar: calendar, year: year, month: month, day: 1, hour: 0, minute: 0, second: 0).date else {
             fatalError("Could not generate date from components")
         }
