@@ -20,7 +20,7 @@ MonthYearWheelPicker uses a block-based `onDateSelected` method to return the mo
         // A standard date object that will be your selected month and year with day set to 1 and time set to 00:00:00
     }
 
-By default, the picker is set to a maximum date of the current month and year and a minimum date of the current month and 100 years in the past. This can be changed using the `minimumDate` and `maximumDate` properties. Just like `UIDatePicker`, invalid dates are shown in grey and will animate you back to a valid date (i.e. if your maximum date is June 2022, then when you scroll to September if will be greyed out and will scroll you back to June; if you then changed the year to 2023, all of the months would be available to you).
+By default, the picker is set to a minimum date of the current month and year and a maximum date of the current month and 15 years in the future (as this makes sense for the most common usage of an expiration date picker for payment processing). This can be changed using the `minimumDate` and `maximumDate` properties. Just like `UIDatePicker`, invalid dates are shown in grey and will animate you back to a valid date (i.e. if your maximum date is June 2022, then when you scroll to September if will be greyed out and will scroll you back to June; if you then changed the year to 2023, all of the months would be available to you).
 
 There are some unit tests included for checking everything is working as well as documentation for all public methods. If you run into any problems, please [open an issue](https://github.com/bendodson/MonthYearPickerView-Swift/issues/new).
 

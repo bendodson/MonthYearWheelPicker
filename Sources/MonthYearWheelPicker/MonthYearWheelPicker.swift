@@ -22,27 +22,27 @@ open class MonthYearWheelPicker: UIPickerView {
     
     /// The maximum date that a picker can show.
     ///
-    /// Use this property to configure the maximum date that is selected in the picker interface. The default is the current month and year.
+    /// Use this property to configure the maximum date that is selected in the picker interface. The default is the current month and 15 years into the future.
     open var maximumDate: Date {
         set {
             _maximumDate = formattedDate(from: newValue)
             updateAvailableYears(animated: false)
         }
         get {
-            return _maximumDate ?? formattedDate(from: Date())
+            return _maximumDate ?? formattedDate(from: calendar.date(byAdding: .year, value: 15, to: Date()) ?? Date())
         }
     }
     
     /// The minimum date that a picker can show.
     ///
-    /// Use this property to configure the minimum date that is selected in the picker interface. The default is the current month and 100 years in the past.
+    /// Use this property to configure the minimum date that is selected in the picker interface. The default is the current month and year.
     open var minimumDate: Date {
         set {
             _minimumDate = formattedDate(from: newValue)
             updateAvailableYears(animated: false)
         }
         get {
-            return _minimumDate ?? formattedDate(from: calendar.date(byAdding: .year, value: -100, to: Date()) ?? Date())
+            return _minimumDate ?? formattedDate(from: Date())
         }
     }
     

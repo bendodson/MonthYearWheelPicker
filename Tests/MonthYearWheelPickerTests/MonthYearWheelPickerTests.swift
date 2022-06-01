@@ -5,22 +5,22 @@ final class MonthYearWheelPickerTests: XCTestCase {
     
     let calendar = Calendar(identifier: .gregorian)
     
-    func testDefaultMaximumDateIsStartOfMonth() throws {
+    func testDefaultMaximumDateIs15YearsInTheFuture() throws {
         let sut = MonthYearWheelPicker()
-        let date = DateComponents(calendar: calendar, year: calendar.component(.year, from: Date()), month: calendar.component(.month, from: Date()), day: 1, hour: 0, minute: 0, second: 0).date ?? Date()
-        XCTAssertEqual(sut.maximumDate, date)
+        let date = Calendar(identifier: .gregorian).date(byAdding: .year, value: 15, to: Date()) ?? Date()
+        let adjustedDate = DateComponents(calendar: calendar, year: calendar.component(.year, from: date), month: calendar.component(.month, from: date), day: 1, hour: 0, minute: 0, second: 0).date ?? Date()
+        XCTAssertEqual(sut.maximumDate, adjustedDate)
     }
     
     func testDefaultMinimumDateIs100YearsAgoAtStartOfMonth() throws {
         let sut = MonthYearWheelPicker()
-        let date = Calendar(identifier: .gregorian).date(byAdding: .year, value: -100, to: Date()) ?? Date()
-        let adjustedDate = DateComponents(calendar: calendar, year: calendar.component(.year, from: date), month: calendar.component(.month, from: date), day: 1, hour: 0, minute: 0, second: 0).date ?? Date()
-        XCTAssertEqual(sut.minimumDate, adjustedDate)
+        let date = DateComponents(calendar: calendar, year: calendar.component(.year, from: Date()), month: calendar.component(.month, from: Date()), day: 1, hour: 0, minute: 0, second: 0).date ?? Date()
+        XCTAssertEqual(sut.minimumDate, date)
     }
     
-    func testDefaultNumberOfYearsIs101() throws {
+    func testDefaultNumberOfYearsIs16() throws {
         let sut = MonthYearWheelPicker()
-        XCTAssertEqual(sut.pickerView(sut, numberOfRowsInComponent: 1), 101)
+        XCTAssertEqual(sut.pickerView(sut, numberOfRowsInComponent: 1), 16)
     }
     
     func testNumberOfYearsIs1IfMinimumDateEqualToMaximumDate() throws {
@@ -43,7 +43,7 @@ final class MonthYearWheelPickerTests: XCTestCase {
     
     func testDateIsLimitedToMaximumDate() {
         let sut = MonthYearWheelPicker()
-        XCTAssertEqual(sut.date, sut.maximumDate) // default date and maximum date are the same
+        XCTAssertNotEqual(sut.date, sut.maximumDate) // default date and maximum date are different
         let earlierDate = DateComponents(calendar: calendar, year: calendar.component(.year, from: sut.maximumDate) - 1, month: calendar.component(.month, from: sut.maximumDate), day: 1, hour: 0, minute: 0, second: 0).date ?? Date()
         sut.date = earlierDate
         XCTAssertNotEqual(sut.date, sut.maximumDate)
@@ -54,7 +54,7 @@ final class MonthYearWheelPickerTests: XCTestCase {
     
     func testDateIsLimitedToMinimumDate() {
         let sut = MonthYearWheelPicker()
-        XCTAssertNotEqual(sut.date, sut.minimumDate) // default date and minimum date are different
+        XCTAssertEqual(sut.date, sut.minimumDate) // default date and minimum date are the same
         let laterDate = DateComponents(calendar: calendar, year: calendar.component(.year, from: sut.minimumDate) + 1, month: calendar.component(.month, from: sut.minimumDate), day: 1, hour: 0, minute: 0, second: 0).date ?? Date()
         sut.date = laterDate
         XCTAssertNotEqual(sut.date, sut.minimumDate)
