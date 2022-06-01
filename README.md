@@ -1,5 +1,7 @@
 # MonthYearWheelPicker
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbendodson%2FMonthYearWheelPicker%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/bendodson/MonthYearWheelPicker) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fbendodson%2FMonthYearWheelPicker%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/bendodson/MonthYearWheelPicker)
+
 A `UIPickerView` subclass that allows you to quickly add a picker for just month and year; in most cases it can be used as a drop-in replacement for `UIDatePicker`.  This is useful when you want to do something like an expiration date picker for a credit card where you are only interested in the month and year and so a `UIDatePicker` is not appropriate.
 
 The current version is written in Swift 5.6 and is supported on iOS 10 and above.
