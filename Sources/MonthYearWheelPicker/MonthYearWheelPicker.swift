@@ -50,7 +50,7 @@ open class MonthYearWheelPicker: UIPickerView {
     ///
     /// Use this property to get and set the currently selected date. The default value of this property is the date when the UIDatePicker object is created. Setting this property animates the date picker by spinning the wheels to the new date and time; if you don't want any animation to occur when you set the date, use the ``setDate(_:animated:)`` method, passing `false` for the animated parameter.
     ///
-    /// - Note: If you attempt to set the date beyond the ``maximumDate``or below the ``minimumDate`` then the date will be corrected to the closest date within those bounds (i.e. if your maximum date is set to 1st June 2022 and you try to set the date as 1st January 2023, the date that will actually be set will be 1st June 2022).
+    /// - Note: If you attempt to set the date beyond the ``maximumDate``or below the ``minimumDate`` then the date will be corrected to the closest date within those bounds (i.e. if your maximum date is set to 1st June 2022 and you try to set the date as 1st January 2023, the date that will actually be set will be 1st June 2022). Also note that dates will be converted so they become the first of the month at midnight (i.e. if you set the date to 21st September 2022 @ 15:33 then the returned date will be 1st September 2022 @ 00:00).
     open var date: Date {
         set {
             setDate(newValue, animated: true)
