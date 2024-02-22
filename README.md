@@ -6,6 +6,8 @@ A `UIPickerView` subclass that allows you to quickly add a picker for just month
 
 The current version is written in Swift 5.6 and is supported on iOS 10 and above.
 
+If you want to use this in SwiftUI, I've [written a basic sample](https://github.com/bendodson/MonthYearWheelPicker/issues/19) to demonstrate how you can rewrite this entire project in SwiftUI as usually easier than porting it in via UIViewRepresentable.
+
 ## Example Usage
 	let expiryDatePicker = MonthYearWheelPicker()
 	expiryDatePicker.onDateSelected = { (month, year) in
